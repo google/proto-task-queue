@@ -45,7 +45,10 @@ class Requestor(object):
     self._publisher = pubsub_publisher_client or client.Client()
 
   def request(self, topic: Text, args: message.Message) -> futures.Future:
-    """Sends a task to background workers.
+    """Constructs a Task proto and sends it to background workers.
+
+    Most callers should use this method unless they have a reason to construct
+    the Task proto themselves.
 
     Args:
       topic: Resource name of the pubsub topic to send the request to.
@@ -58,6 +61,21 @@ class Requestor(object):
     """
     task = task_pb2.Task()
     task.args.Pack(args)
+    return self.request_task(topic, task)
+
+  def request_task(self, topic: Text, task: task_pb2.Task) -> futures.Future:
+    """Sends a Task proto to background workers.
+
+    Prefer using request() above if you don't already have a Task proto.
+
+    Args:
+      topic: Resource name of the pubsub topic to send the request to.
+      task: Task to send.
+
+    Returns:
+      Future for the request. The future will complete when the request is sent,
+      not when the task is completed.
+    """
     task_bytes = task.SerializeToString()
     logging.info('Sending background task to %s: %s', topic,
                  text_format.MessageToString(task))

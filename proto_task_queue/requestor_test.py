@@ -22,6 +22,7 @@ from __future__ import print_function
 from unittest import mock
 
 from absl.testing import absltest
+from absl.testing import parameterized
 from proto_task_queue import requestor
 from proto_task_queue import task_pb2
 from proto_task_queue import test_task_pb2
@@ -29,19 +30,24 @@ from proto_task_queue import test_task_pb2
 from google.cloud.pubsub_v1.publisher import client
 
 
-class RequestorTest(absltest.TestCase):
+class RequestorTest(parameterized.TestCase):
 
   def setUp(self):
     self._client = mock.create_autospec(client.Client)
     self._requestor = requestor.Requestor(pubsub_publisher_client=self._client)
 
-  def test_publish(self):
+  @parameterized.named_parameters(('request', True), ('request_task', False))
+  def test_publish_is_called_by(self, request_by_args):
     args = test_task_pb2.FooTaskArgs()
     task = task_pb2.Task()
     task.args.Pack(args)
     publish_future = mock.Mock()
     self._client.publish.return_value = publish_future
-    self.assertIs(publish_future, self._requestor.request('kumquat', args))
+    if request_by_args:
+      returned_future = self._requestor.request('kumquat', args)
+    else:
+      returned_future = self._requestor.request_task('kumquat', task)
+    self.assertIs(publish_future, returned_future)
     self._client.publish.assert_called_once_with('kumquat',
                                                  task.SerializeToString())
 
