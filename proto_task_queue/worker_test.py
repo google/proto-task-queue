@@ -19,6 +19,7 @@ from __future__ import print_function
 
 from unittest import mock
 import uuid
+import warnings
 
 from absl.testing import absltest
 from absl.testing import parameterized
@@ -101,7 +102,10 @@ class WorkerTest(parameterized.TestCase):
     msg.data = message_data
     msg.message_id = str(uuid.uuid4())
     self._mock_subscribe([msg])
-    self._worker.subscribe('kumquat')
+    with warnings.catch_warnings():
+      # Ignore a warning from trying to parse an invalid binary proto.
+      warnings.filterwarnings('ignore', 'Unexpected end-group tag:')
+      self._worker.subscribe('kumquat')
     msg.nack.assert_called_once_with()
 
   def test_callback_error(self):
