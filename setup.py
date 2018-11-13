@@ -53,6 +53,9 @@ setuptools.setup(
         'proto_task_queue.worker',
     ],
     python_requires='>=3.6',
+    setup_requires=[
+        'pytest-runner>=4.2',
+    ],
     install_requires=[
         'attrs>=18.2.0',
         'google-cloud-pubsub>=0.38.0',
@@ -61,7 +64,6 @@ setuptools.setup(
     tests_require=[
         'absl-py>=0.6.1',
     ],
-    test_suite='proto_task_queue',
     cmdclass={
         'build_py': BuildProtoAndPy,
     },
