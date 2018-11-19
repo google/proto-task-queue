@@ -50,6 +50,7 @@ setuptools.setup(
     name='proto-task-queue',
     version='0.0.1',
     py_modules=[
+        'proto_task_queue',
         'proto_task_queue.requestor',
         'proto_task_queue.task_pb2',
         'proto_task_queue.worker',
