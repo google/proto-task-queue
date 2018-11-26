@@ -66,6 +66,7 @@ setuptools.setup(
     ],
     tests_require=[
         'absl-py>=0.6.1',
+        'pytest>=4.0.0',
     ],
     cmdclass={
         'build_py': BuildProtoAndPy,
