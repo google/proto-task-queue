@@ -33,6 +33,7 @@ from google.cloud.pubsub_v1.publisher import client
 class RequestorTest(parameterized.TestCase):
 
   def setUp(self):
+    super().setUp()
     self._client = mock.create_autospec(client.Client)
     self._requestor = requestor.Requestor(pubsub_publisher_client=self._client)
 

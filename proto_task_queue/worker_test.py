@@ -60,6 +60,7 @@ def _make_mock_pubsub_message(task_args):
 class WorkerTest(parameterized.TestCase):
 
   def setUp(self):
+    super().setUp()
     self._client = mock.create_autospec(client.Client)
     self._worker = worker.Worker(pubsub_subscriber_client=self._client)
 

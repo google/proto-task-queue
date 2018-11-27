@@ -49,6 +49,8 @@ _SUBSCRIPTION_NAME = 'projects/{}/subscriptions/{}'.format(
 class ProtoTaskQueueTest(absltest.TestCase):
 
   def setUp(self):
+    super().setUp()
+
     self._publisher_client = publisher_client.Client()
     self._publisher_client.create_topic(_TOPIC_NAME)
     self._subscriber_client = subscriber_client.Client()
@@ -60,6 +62,8 @@ class ProtoTaskQueueTest(absltest.TestCase):
   def tearDown(self):
     self._subscriber_client.delete_subscription(_SUBSCRIPTION_NAME)
     self._publisher_client.delete_topic(_TOPIC_NAME)
+
+    super().tearDown()
 
   def test_retry_failure_then_succeed(self):
     # Fail once, then succeed.
