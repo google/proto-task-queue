@@ -52,7 +52,27 @@ class _Registration(Generic[_TaskArgsType]):
 
 
 class Worker(object):
-  """Background worker that runs tasks from Cloud Pub/Sub."""
+  """Background worker that runs tasks from Cloud Pub/Sub.
+
+  Typical usage example:
+
+    # Set up the worker.
+    my_worker = Worker()
+    my_worker.register(MyProtoClass, my_callback)
+    my_worker.register(OtherProtoClass, other_callback)
+
+    # Start subscribing.
+    subscribe_future = my_worker.subscribe(
+        'projects/my-project/subscriptions/my-subscription')
+
+    # Block the current thread on the subscriber thread.
+    subscribe_future.result()
+
+  Alternatively, the last two lines can be replaced with other logic if the
+  current thread should continue doing work. In that case, see
+  https://docs.python.org/3/library/concurrent.futures.html#future-objects for
+  subscribe_future's other methods.
+  """
 
   _message_type_registry: Dict[Text, _Registration]
   _subscriber: client.Client
