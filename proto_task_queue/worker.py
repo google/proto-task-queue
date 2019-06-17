@@ -47,8 +47,8 @@ class _Registration(Generic[_TaskArgsType]):
     callback: Implementation of the task.
   """
 
-  task_args_class: _TaskArgsClassType
-  callback: _TaskCallbackType
+  task_args_class: _TaskArgsClassType  # pytype: disable=not-supported-yet
+  callback: _TaskCallbackType  # pytype: disable=not-supported-yet
 
 
 class Worker(object):
