@@ -15,7 +15,7 @@
 
 from concurrent import futures
 import logging
-from typing import Optional
+from typing import Callable, Optional
 
 from proto_task_queue import task_pb2
 
@@ -29,14 +29,23 @@ class Requestor(object):
 
   _publisher: client.Client
 
-  def __init__(self, pubsub_publisher_client: Optional[client.Client] = None):
+  def __init__(
+      self,
+      pubsub_publisher_client: Optional[client.Client] = None,
+      *,
+      task_to_string: Callable[[task_pb2.Task],
+                               str] = text_format.MessageToString,
+  ):
     """Constructor.
 
     Args:
       pubsub_publisher_client: Cloud Pub/Sub publisher client, or None to use
         the default.
+      task_to_string: Function that converts a Task to a human-readable string
+        for logging.
     """
     self._publisher = pubsub_publisher_client or client.Client()
+    self._task_to_string = task_to_string
 
   def request(self, topic: str, args: message.Message) -> futures.Future:
     """Constructs a Task proto and sends it to background workers.
@@ -71,6 +80,6 @@ class Requestor(object):
       not when the task is completed.
     """
     task_bytes = task.SerializeToString()
-    logging.info('Sending background task to %s: %s', topic,
-                 text_format.MessageToString(task))
+    logging.info('Sending background task to %s:\n%s', topic,
+                 self._task_to_string(task))
     return self._publisher.publish(topic, task_bytes)
