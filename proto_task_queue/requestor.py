@@ -1,5 +1,3 @@
-# python3
-
 # Copyright 2018 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +13,9 @@
 # limitations under the License.
 """Client code for requesting tasks over Cloud Pub/Sub."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from concurrent import futures
 import logging
-from typing import Optional, Text
+from typing import Optional
 
 from proto_task_queue import task_pb2
 
@@ -44,7 +38,7 @@ class Requestor(object):
     """
     self._publisher = pubsub_publisher_client or client.Client()
 
-  def request(self, topic: Text, args: message.Message) -> futures.Future:
+  def request(self, topic: str, args: message.Message) -> futures.Future:
     """Constructs a Task proto and sends it to background workers.
 
     Most callers should use this method unless they have a reason to construct
@@ -63,7 +57,7 @@ class Requestor(object):
     task.args.Pack(args)
     return self.request_task(topic, task)
 
-  def request_task(self, topic: Text, task: task_pb2.Task) -> futures.Future:
+  def request_task(self, topic: str, task: task_pb2.Task) -> futures.Future:
     """Sends a Task proto to background workers.
 
     Prefer using request() above if you don't already have a Task proto.
