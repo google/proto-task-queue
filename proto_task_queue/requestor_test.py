@@ -1,5 +1,3 @@
-# python3
-
 # Copyright 2018 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for proto_task_queue.requestor."""
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 from unittest import mock
 

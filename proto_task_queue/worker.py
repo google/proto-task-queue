@@ -1,5 +1,3 @@
-# python3
-
 # Copyright 2018 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +13,8 @@
 # limitations under the License.
 """Background workers to run tasks from Cloud Pub/Sub."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import logging
-from typing import Callable, Dict, Generic, Optional, Text, Type, TypeVar
+from typing import Callable, Dict, Generic, Optional, Type, TypeVar
 
 import attr
 from proto_task_queue import task_pb2
@@ -74,7 +68,7 @@ class Worker(object):
   subscribe_future's other methods.
   """
 
-  _message_type_registry: Dict[Text, _Registration]
+  _message_type_registry: Dict[str, _Registration]
   _subscriber: client.Client
   _possibly_subscribing: bool
 
@@ -116,7 +110,7 @@ class Worker(object):
     logging.info('Registered callback for %s', full_name)
 
   def subscribe(self,
-                subscription_name: Text) -> pubsub_futures.StreamingPullFuture:
+                subscription_name: str) -> pubsub_futures.StreamingPullFuture:
     """Starts processing tasks from a subscription, in the background.
 
     Args:

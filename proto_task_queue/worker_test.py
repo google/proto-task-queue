@@ -1,5 +1,3 @@
-# python3
-
 # Copyright 2018 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for proto_task_queue.worker."""
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 from unittest import mock
 import uuid
@@ -72,7 +66,7 @@ class WorkerTest(parameterized.TestCase):
     self._worker.register(test_task_pb2.BarTaskArgs, bar_task_processor)
 
     # Create pubsub messages.
-    foo_task_args = test_task_pb2.FooTaskArgs(widget=u'Water is made of water.')
+    foo_task_args = test_task_pb2.FooTaskArgs(widget='Water is made of water.')
     foo_message = _make_mock_pubsub_message(foo_task_args)
     bar_task_args = test_task_pb2.BarTaskArgs(best_number=42)
     bar_message = _make_mock_pubsub_message(bar_task_args)
