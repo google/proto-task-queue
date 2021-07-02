@@ -72,16 +72,25 @@ class Worker(object):
   _subscriber: client.Client
   _possibly_subscribing: bool
 
-  def __init__(self, pubsub_subscriber_client: Optional[client.Client] = None):
+  def __init__(
+      self,
+      pubsub_subscriber_client: Optional[client.Client] = None,
+      *,
+      task_to_string: Callable[[task_pb2.Task],
+                               str] = text_format.MessageToString,
+  ):
     """Constructor.
 
     Args:
       pubsub_subscriber_client: Cloud Pub/Sub subscriber client, or None to use
         the default.
+      task_to_string: Function that converts a Task to a human-readable string
+        for logging.
     """
     self._message_type_registry = {}
     self._subscriber = pubsub_subscriber_client or client.Client()
     self._possibly_subscribing = False
+    self._task_to_string = task_to_string
 
   def register(self, task_args_class: _TaskArgsClassType,
                callback: _TaskCallbackType) -> None:
@@ -151,8 +160,8 @@ class Worker(object):
     task.args.Unpack(args)
 
     # Call the registered callback.
-    logging.info('Processing task (message_id=%s): %s', message.message_id,
-                 text_format.MessageToString(task))
+    logging.info('Processing task (message_id=%s):\n%s', message.message_id,
+                 self._task_to_string(task))
     try:
       registration.callback(args)
     except Exception:  # pylint: disable=broad-except
