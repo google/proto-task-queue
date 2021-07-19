@@ -159,9 +159,19 @@ class Worker(object):
     args = registration.task_args_class()
     task.args.Unpack(args)
 
+    # Convert the task to a loggable string.
+    try:
+      task_string = self._task_to_string(task)
+    except Exception:  # pylint: disable=broad-except
+      logging.exception(
+          'Unable to convert task of type %s to a string for logging.',
+          full_name)
+      message.nack()
+      return
+
     # Call the registered callback.
     logging.info('Processing task (message_id=%s):\n%s', message.message_id,
-                 self._task_to_string(task))
+                 task_string)
     try:
       registration.callback(args)
     except Exception:  # pylint: disable=broad-except

@@ -19,6 +19,7 @@ import warnings
 
 from absl.testing import absltest
 from absl.testing import parameterized
+from google.protobuf import text_format
 from proto_task_queue import task_pb2
 from proto_task_queue import test_task_pb2
 from proto_task_queue import worker
@@ -56,7 +57,11 @@ class WorkerTest(parameterized.TestCase):
   def setUp(self):
     super().setUp()
     self._client = mock.create_autospec(client.Client)
-    self._worker = worker.Worker(pubsub_subscriber_client=self._client)
+    self._task_to_string = mock.Mock(side_effect=text_format.MessageToString)
+    self._worker = worker.Worker(
+        pubsub_subscriber_client=self._client,
+        task_to_string=self._task_to_string,
+    )
 
   def test_routing_and_task_success(self):
     # Register two types of tasks.
@@ -104,6 +109,15 @@ class WorkerTest(parameterized.TestCase):
       warnings.filterwarnings('ignore', 'Unexpected end-group tag:')
       self._worker.subscribe('kumquat')
     msg.nack.assert_called_once_with()
+
+  def test_task_to_string_error(self):
+    self._task_to_string.side_effect = RuntimeError(
+        'Unable to convert proto to string.')
+    self._worker.register(test_task_pb2.FooTaskArgs, mock.Mock())
+    foo_message = _make_mock_pubsub_message(test_task_pb2.FooTaskArgs())
+    self._mock_subscribe([foo_message])
+    self._worker.subscribe('kumquat')
+    foo_message.nack.assert_called_once_with()
 
   def test_callback_error(self):
     foo_task_processor = mock.Mock(side_effect=RuntimeError('foo error'))
