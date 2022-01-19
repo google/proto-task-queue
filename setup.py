@@ -49,7 +49,7 @@ setuptools.setup(
         'proto_task_queue.task_pb2',
         'proto_task_queue.worker',
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     setup_requires=[
         'pytest-runner>=4.2',
     ],
