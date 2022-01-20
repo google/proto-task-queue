@@ -143,6 +143,13 @@ class Worker(object):
       task = task_pb2.Task.FromString(message.data)
     except proto_message.DecodeError as e:
       logging.error('Unable to deserialize Task proto: %s', e)
+      # If the message is gibberish, nacking keeps putting it back, wasting
+      # resources for no reason. If the message is fine but there's a parsing
+      # bug, nacking makes it possible to process the message normally after
+      # fixing the bug. If the expected format of the message ever changes in an
+      # incompatible way and a message with the new format is sent before the
+      # worker is updated, nacking makes it possible to process the message
+      # normally after updating the worker.
       message.nack()
       return
 
@@ -152,6 +159,13 @@ class Worker(object):
       registration = self._message_type_registry[full_name]
     except KeyError:
       logging.warning('Unknown type of task: %s', task.args.type_url)
+      # If the task has a bogus type, nacking keeps putting it back, wasting
+      # resources for no reason. If a new task type is added and those tasks are
+      # requested before the worker code is updated, nacking makes it possible
+      # to process the tasks after the worker code is updated. If an existing
+      # task type is removed from the running worker code before all tasks of
+      # that type have been processed, nacking keeps putting it back, wasting
+      # resources.
       message.nack()
       return
 
@@ -166,6 +180,14 @@ class Worker(object):
       logging.exception(
           'Unable to convert task of type %s to a string for logging.',
           full_name)
+      # If self._task_to_string() fails for a reason unrelated to the task
+      # itself, nacking makes it possible to process the task once
+      # self._task_to_string() is working again. If something about the task
+      # makes self._task_to_string() fail consistently, nacking makes it
+      # possible to process the task once the bug in self._task_to_string() is
+      # fixed. Additionally, users can catch and ignore exceptions in
+      # self._task_to_string() itself if they want to always process tasks
+      # regardless of whether it's possible to log the contents of the task.
       message.nack()
       return
 
@@ -176,6 +198,8 @@ class Worker(object):
       registration.callback(args)
     except Exception:  # pylint: disable=broad-except
       logging.exception('Task failed (message_id=%s).', message.message_id)
+      # See the comment above about nacking on self._task_to_string() failures
+      # for the considerations here.
       message.nack()
     else:
       logging.info('Finished task (message_id=%s).', message.message_id)
