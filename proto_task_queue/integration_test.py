@@ -46,16 +46,17 @@ class ProtoTaskQueueTest(absltest.TestCase):
     super().setUp()
 
     self._publisher_client = publisher_client.Client()
-    self._publisher_client.create_topic(_TOPIC_NAME)
+    self._publisher_client.create_topic(name=_TOPIC_NAME)
     self._subscriber_client = subscriber_client.Client()
-    self._subscriber_client.create_subscription(_SUBSCRIPTION_NAME, _TOPIC_NAME)
+    self._subscriber_client.create_subscription(
+        name=_SUBSCRIPTION_NAME, topic=_TOPIC_NAME)
 
     self._requestor = requestor.Requestor()
     self._worker = worker.Worker()
 
   def tearDown(self):
-    self._subscriber_client.delete_subscription(_SUBSCRIPTION_NAME)
-    self._publisher_client.delete_topic(_TOPIC_NAME)
+    self._subscriber_client.delete_subscription(subscription=_SUBSCRIPTION_NAME)
+    self._publisher_client.delete_topic(topic=_TOPIC_NAME)
 
     super().tearDown()
 
