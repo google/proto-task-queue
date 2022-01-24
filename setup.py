@@ -55,7 +55,7 @@ setuptools.setup(
     ],
     install_requires=[
         'attrs>=18.2.0',
-        'google-cloud-pubsub>=0.38.0',
+        'google-cloud-pubsub>=2.0.0',
         'protobuf>=3.6.1',
     ],
     tests_require=[
