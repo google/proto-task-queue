@@ -42,7 +42,7 @@ class BuildProtoAndPy(build_py.build_py):
 
 setuptools.setup(
     name='proto-task-queue',
-    version='0.0.1',
+    version='0.0.2',
     py_modules=[
         'proto_task_queue',
         'proto_task_queue.requestor',
@@ -56,7 +56,7 @@ setuptools.setup(
     install_requires=[
         'attrs>=18.2.0',
         'google-cloud-pubsub>=2.0.0',
-        'protobuf>=3.6.1',
+        'protobuf>=4.25.8',
     ],
     tests_require=[
         'absl-py>=0.6.1',
